@@ -5,10 +5,10 @@ from dataclasses import dataclass
 class AnimeEntry:
     title: str
     score: float
-    format: str
+    show_format: str
 
 
-def fetch_anilist_data(username: str) -> list[AnimeEntry]:
+def fetch_anilist_data(username: str) -> dict:
     """
     Fetches data from Anilist GraphQL API.
 
@@ -60,22 +60,30 @@ def create_entries_list(json_data: dict) -> list[AnimeEntry]:
     entries = []
 
     for entry in entries_json_data:
+        print(entry)
         entries.append(_create_entry(entry))
 
     return entries
 
+def get_username(json_data: dict) -> str:
+    """
+    Returns the username of the user.
+    """
+    return json_data['data']['MediaListCollection']['user']['name']
 
-def _create_entry(entries_json_data: dict):
+
+def _create_entry(entry_data: dict):
     """
     Creates a single entry object to store anime information.
     """
-    entry = AnimeEntry()
+    title = entry_data['media']['title']['english']
+    if title == None:
+        title = entry_data['media']['title']['romaji']
 
-    entry.title = entries_json_data['media']['title']['english']
-    entry.score = entries_json_data['score']
-    entry.format = entries_json_data['media']['format']
+    score = entry_data['score']
+    show_format = entry_data['media']['format']
 
-    return entry
+    return AnimeEntry(title=title, score=score, show_format=show_format)
 
 
         
