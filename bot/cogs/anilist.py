@@ -1,7 +1,7 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-from utils.anilist.fetch_anilist_data import fetch_anilist_data
+from utils.anilist.fetch_anilist_data import create_entries_list, fetch_anilist_data
 
 class Anilist(commands.Cog):
     def __init__(self, bot):
@@ -14,6 +14,8 @@ class Anilist(commands.Cog):
     @app_commands.command(name="anilist-profile", description="Displays anilist profile")
     async def anilist(self, interaction: discord.Interaction, username: str):
         data = fetch_anilist_data(username)
+        entries = create_entries_list(data)
+
         await interaction.response.send_message(f"Success!")
         
 
