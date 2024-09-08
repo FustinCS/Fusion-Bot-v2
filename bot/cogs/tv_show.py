@@ -3,20 +3,23 @@ from discord import app_commands
 from discord.ext import commands
 from utils.anilist.pagination import ButtonView
 from utils.tv_show.create_tv_embed import create_tv_embeds
-from utils.tv_show.database_retrieval import add_watched_show, ShowExistsException, get_user_watch_list, remove_watched_show
+from utils.tv_show.database_retrieval import add_watched_show, ShowExistsException, get_season_episode_count, get_user_watch_list, remove_watched_show, update_episode, update_season
 from utils.tv_show.fetch_show_data import fetch_show_data
 
 class TVShow(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+
     @commands.Cog.listener()
     async def on_ready(self):
         print("tv_show.py is ready!")
 
+
     @app_commands.command(name="tv-profile", description="Displays TV Shows List")
     async def tv_profile(self, interaction: discord.Interaction):
         await interaction.response.send_message("TV Show Profile")
+
 
     @app_commands.command(name="display-tv-data", description="Displays TV Show Data")
     async def display_tv_data(self, interaction: discord.Interaction, show_name: str):
@@ -29,6 +32,7 @@ class TVShow(commands.Cog):
 
         await interaction.response.send_message("Success!")
     
+
     @app_commands.command(name="tv-display", description="Displays TV Show Profile")
     async def tv_display(self, interaction: discord.Interaction):
         watch_data = get_user_watch_list(interaction.user.id)
@@ -62,10 +66,45 @@ class TVShow(commands.Cog):
 
             if not removed:
                 await interaction.response.send_message("Show not found in profile!")
-
+                return
+            
             await interaction.response.send_message(f"`{show_data.name}` removed from list.")
         except Exception:
             await interaction.response.send_message("Failed to remove show from profile! (Unknown Error)")
+    
+    
+    @app_commands.command(name="tv-update-episode", description="Update TV Show Episode Count.")
+    async def tv_update_episode(self, interaction: discord.Interaction, show_name: str, episode: int):
+        try:
+            show_data = fetch_show_data(show_name)
+            total_episodes = get_season_episode_count(interaction.user.id ,show_data.show_id)
+
+            # if given a bigger episode number than the total episodes in the season, we automatically set it to the max episodes
+            if total_episodes != None and episode > total_episodes:
+                episode = total_episodes
+
+            update_episode(interaction.user.id, show_data.show_id, episode)
+
+            await interaction.response.send_message(f"`{show_data.name}` progress updated to episode `{episode}`.")
+        except Exception:
+            await interaction.response.send_message("Failed to update show progress! (Unknown Error)")
+        
+
+    @app_commands.command(name="tv-update-season", description="Update TV Show Season Count.")
+    async def tv_update_season(self, interaction: discord.Interaction, show_name: str, season: int):
+        try:
+            show_data = fetch_show_data(show_name)
+            total_seasons = show_data.total_seasons
+
+            if season > total_seasons:
+                season = total_seasons
+
+            update_season(interaction.user.id, show_data.show_id, season)
+
+            await interaction.response.send_message(f"`{show_data.name}` progress updated to season `{season}`.")
+        except Exception:
+            await interaction.response.send_message("Failed to update show progress! (Unknown Error)")
+
 
 async def setup(bot):
     await bot.add_cog(TVShow(bot))

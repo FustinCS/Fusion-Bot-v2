@@ -34,6 +34,32 @@ def connect_to_db():
     return conn
 
 
+def get_season_episode_count(user_id:int, show_id: int) -> int:
+    connection = connect_to_db()
+    try:
+        cursor = connection.cursor()
+
+        cursor.execute(""" 
+            SELECT s.episodes
+            FROM "Show" s
+            JOIN "Watches" w ON s.show_id = w.show_id
+            WHERE w.user_id = %s AND w.show_id = %s AND s.season = w.current_season
+        """, (user_id, show_id))
+
+        result = cursor.fetchone()
+        
+        if not result:
+            raise Exception("Show not found in profile")
+        
+        return result[0]
+
+    except Exception as e:
+        raise Exception()
+    finally:
+        cursor.close()
+        connection.close()
+
+
 def get_user_watch_list(user_id: int) -> list[ShowEntry]:
     """
     Fetches all of the users currently watched shows.
@@ -129,6 +155,43 @@ def remove_watched_show(user_id: int, show_id: int) -> int:
 
         return cursor.rowcount
 
+    except Exception as e:
+        connection.rollback()
+        raise Exception()
+    finally:
+        cursor.close()
+        connection.close()
+
+
+def update_episode(user_id: int, show_id: int, episode: int):
+    connection = connect_to_db()
+
+    try:
+        cursor = connection.cursor()
+        cursor.execute("""
+            UPDATE "Watches"
+            SET current_episode = %s, date_updated = NOW()
+            WHERE user_id = %s AND show_id = %s;           
+        """, (episode, user_id, show_id))
+        connection.commit()
+    except Exception as e:
+        connection.rollback()
+        raise Exception()
+    finally:
+        cursor.close()
+        connection.close()
+
+def update_season(user_id: int, show_id: int, season: int):
+    connection = connect_to_db()
+
+    try:
+        cursor = connection.cursor()
+        cursor.execute("""
+            UPDATE "Watches"
+            SET current_season = %s, current_episode = 0, date_updated = NOW()
+            WHERE user_id = %s AND show_id = %s;
+        """, (season, user_id, show_id))
+        connection.commit()
     except Exception as e:
         connection.rollback()
         raise Exception()
