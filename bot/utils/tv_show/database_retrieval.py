@@ -112,4 +112,26 @@ def add_watched_show(user_id: int, entry: ShowData):
     finally:
         cursor.close()
         connection.close()
-    
+
+
+def remove_watched_show(user_id: int, show_id: int) -> int:
+    connection = connect_to_db()
+    try:
+        cursor = connection.cursor()
+
+        cursor.execute("""
+            DELETE FROM "Watches"
+            WHERE
+                user_id = %s AND show_id = %s;
+        """, (user_id, show_id))
+        
+        connection.commit()
+
+        return cursor.rowcount
+
+    except Exception as e:
+        connection.rollback()
+        raise Exception()
+    finally:
+        cursor.close()
+        connection.close()

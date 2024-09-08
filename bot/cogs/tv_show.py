@@ -3,7 +3,7 @@ from discord import app_commands
 from discord.ext import commands
 from utils.anilist.pagination import ButtonView
 from utils.tv_show.create_tv_embed import create_tv_embeds
-from utils.tv_show.database_retrieval import add_watched_show, ShowExistsException, get_user_watch_list
+from utils.tv_show.database_retrieval import add_watched_show, ShowExistsException, get_user_watch_list, remove_watched_show
 from utils.tv_show.fetch_show_data import fetch_show_data
 
 class TVShow(commands.Cog):
@@ -46,7 +46,7 @@ class TVShow(commands.Cog):
         try:
             show_data = fetch_show_data(show_name)
             add_watched_show(interaction.user.id, show_data)
-            await interaction.response.send_message(f"`{show_data.name}` added to profile!")
+            await interaction.response.send_message(f"`{show_data.name}` added to list.")
 
         except ShowExistsException:
             await interaction.response.send_message("Show already exists in profile!")
@@ -54,6 +54,18 @@ class TVShow(commands.Cog):
             await interaction.response.send_message("Failed to add show to profile! (Unknown Error)")
             
 
+    @app_commands.command(name="tv-remove", description="Remove TV Show from Profile")
+    async def tv_remove(self, interaction: discord.Interaction, show_name: str):
+        try:
+            show_data = fetch_show_data(show_name)
+            removed = remove_watched_show(interaction.user.id, show_data.show_id)
+
+            if not removed:
+                await interaction.response.send_message("Show not found in profile!")
+
+            await interaction.response.send_message(f"`{show_data.name}` removed from list.")
+        except Exception:
+            await interaction.response.send_message("Failed to remove show from profile! (Unknown Error)")
 
 async def setup(bot):
     await bot.add_cog(TVShow(bot))
