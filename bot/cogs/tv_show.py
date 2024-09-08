@@ -1,7 +1,7 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-from utils.anilist.pagination import ButtonView
+from bot.utils.general.pagination import ButtonView
 from utils.tv_show.create_tv_embed import create_tv_embeds
 from utils.tv_show.database_retrieval import add_watched_show, ShowExistsException, get_season_episode_count, get_user_watch_list, remove_watched_show, update_episode, update_season
 from utils.tv_show.fetch_show_data import fetch_show_data
@@ -19,18 +19,6 @@ class TVShow(commands.Cog):
     @app_commands.command(name="tv-profile", description="Displays TV Shows List")
     async def tv_profile(self, interaction: discord.Interaction):
         await interaction.response.send_message("TV Show Profile")
-
-
-    @app_commands.command(name="display-tv-data", description="Displays TV Show Data")
-    async def display_tv_data(self, interaction: discord.Interaction, show_name: str):
-        show_data = fetch_show_data(show_name)
-
-        print(show_data.show_id)
-        print(show_data.name)
-        print(show_data.total_seasons)
-        print(show_data.seasons)
-
-        await interaction.response.send_message("Success!")
     
 
     @app_commands.command(name="tv-display", description="Displays TV Show Profile")
@@ -104,7 +92,7 @@ class TVShow(commands.Cog):
             await interaction.response.send_message(f"`{show_data.name}` progress updated to season `{season}`.")
         except Exception:
             await interaction.response.send_message("Failed to update show progress! (Unknown Error)")
-
+    
 
 async def setup(bot):
     await bot.add_cog(TVShow(bot))
