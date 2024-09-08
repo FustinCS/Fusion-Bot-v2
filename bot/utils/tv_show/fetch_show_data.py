@@ -5,14 +5,17 @@ import requests
 Season = namedtuple('Season', ['season_number', 'episode_count'])
 
 @dataclass
-class ShowEntry:
+class ShowData:
     show_id: int
     name: str
     total_seasons: int
     seasons: list[Season]
 
 
-def fetch_show_data(show_name: str) -> ShowEntry:
+def fetch_show_data(show_name: str) -> ShowData:
+    """
+    Fetches TV show data from the TVMaze API.    
+    """
     show_response = requests.get(f"https://api.tvmaze.com/singlesearch/shows?q={show_name}")
     show_data = show_response.json()
     
@@ -30,6 +33,6 @@ def fetch_show_data(show_name: str) -> ShowEntry:
         episode_count = season['episodeOrder']
         seasons.append(Season(season_number, episode_count))
     
-    return ShowEntry(show_id=show_id, name=name, total_seasons=total_seasons, seasons=seasons)
+    return ShowData(show_id=show_id, name=name, total_seasons=total_seasons, seasons=seasons)
 
     
