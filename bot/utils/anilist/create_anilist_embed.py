@@ -1,7 +1,7 @@
 from discord import Embed, Color
 from utils.anilist.fetch_anilist_data import AnimeEntry
 
-def create_embeds(entries: list[AnimeEntry], username: str) -> list[Embed]:
+def create_anilist_embeds(entries: list[AnimeEntry], username: str) -> list[Embed]:
     """
     Creates a list of embeds to display the user's anime entries.
     """

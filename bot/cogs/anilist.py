@@ -2,7 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from utils.anilist.pagination import ButtonView
-from utils.anilist.create_embed import create_embeds
+from bot.utils.anilist.create_anilist_embed import create_anilist_embeds
 from utils.anilist.fetch_anilist_data import create_entries_list, fetch_anilist_data, get_username
 
 class Anilist(commands.Cog):
@@ -20,7 +20,7 @@ class Anilist(commands.Cog):
         anilist_username = get_username(data)
         entries = create_entries_list(data)
 
-        embeds = create_embeds(entries, anilist_username)
+        embeds = create_anilist_embeds(entries, anilist_username)
 
         
         view = ButtonView(embeds)
