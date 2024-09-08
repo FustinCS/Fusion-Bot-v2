@@ -99,6 +99,7 @@ def get_user_watch_list(user_id: int) -> list[ShowEntry]:
         cursor.close()
         connection.close()
 
+
 def add_watched_show(user_id: int, entry: ShowData):
     connection = connect_to_db()
     
@@ -180,6 +181,7 @@ def update_episode(user_id: int, show_id: int, episode: int):
     finally:
         cursor.close()
         connection.close()
+
 
 def update_season(user_id: int, show_id: int, season: int):
     connection = connect_to_db()

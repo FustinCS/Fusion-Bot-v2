@@ -25,11 +25,13 @@ async def sync(ctx: commands.Context):
     synced = await bot.tree.sync()
     await ctx.send(f"Synced {len(synced)} commands!")
 
+
 # load all cogs
 async def load():
     for filename in os.listdir('./bot/cogs'):
         if filename.endswith('.py'):
             await bot.load_extension(f'cogs.{filename[:-3]}')
+
 
 # driver code to launch bot
 async def main():

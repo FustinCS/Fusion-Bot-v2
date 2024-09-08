@@ -65,6 +65,7 @@ def create_entries_list(json_data: dict) -> list[AnimeEntry]:
 
     return entries
 
+
 def get_username(json_data: dict) -> str:
     """
     Returns the username of the user.

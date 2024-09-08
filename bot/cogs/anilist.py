@@ -9,9 +9,11 @@ class Anilist(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+
     @commands.Cog.listener()
     async def on_ready(self):
         print("anilist.py is ready!")
+
 
     @app_commands.command(name="anilist-profile", description="Displays anilist profile")
     async def anilist(self, interaction: discord.Interaction, username: str):
