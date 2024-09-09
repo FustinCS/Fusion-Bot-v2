@@ -1,7 +1,7 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-from bot.utils.general.pagination import ButtonView
+from utils.general.pagination import ButtonView
 from utils.tv_show.create_tv_embed import create_tv_embeds
 from utils.tv_show.database_retrieval import add_watched_show, ShowExistsException, get_season_episode_count, get_user_watch_list, remove_watched_show, update_episode, update_season
 from utils.tv_show.fetch_show_data import fetch_show_data
