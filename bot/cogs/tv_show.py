@@ -23,7 +23,7 @@ class TVShow(commands.Cog):
 
     @app_commands.command(name="tv-display", description="Displays TV Show Profile")
     async def tv_display(self, interaction: discord.Interaction):
-        watch_data = get_user_watch_list(interaction.user.id)
+        watch_data = get_user_watch_list(str(interaction.user.id))
         embeds = create_tv_embeds(watch_data, interaction.user.name)
 
         if len(embeds) == 0:
@@ -37,7 +37,7 @@ class TVShow(commands.Cog):
     async def tv_add(self, interaction: discord.Interaction, show_name: str):
         try:
             show_data = fetch_show_data(show_name)
-            add_watched_show(interaction.user.id, show_data)
+            add_watched_show(str(interaction.user.id), show_data)
             await interaction.response.send_message(f"`{show_data.name}` added to list.")
 
         except ShowExistsException:
@@ -50,7 +50,7 @@ class TVShow(commands.Cog):
     async def tv_remove(self, interaction: discord.Interaction, show_name: str):
         try:
             show_data = fetch_show_data(show_name)
-            removed = remove_watched_show(interaction.user.id, show_data.show_id)
+            removed = remove_watched_show(str(interaction.user.id), show_data.show_id)
 
             if not removed:
                 await interaction.response.send_message("Show not found in profile!")
@@ -65,13 +65,13 @@ class TVShow(commands.Cog):
     async def tv_update_episode(self, interaction: discord.Interaction, show_name: str, episode: int):
         try:
             show_data = fetch_show_data(show_name)
-            total_episodes = get_season_episode_count(interaction.user.id ,show_data.show_id)
+            total_episodes = get_season_episode_count(str(interaction.user.id), show_data.show_id)
 
             # if given a bigger episode number than the total episodes in the season, we automatically set it to the max episodes
             if total_episodes != None and episode > total_episodes:
                 episode = total_episodes
 
-            update_episode(interaction.user.id, show_data.show_id, episode)
+            update_episode(str(interaction.user.id), show_data.show_id, episode)
 
             await interaction.response.send_message(f"`{show_data.name}` progress updated to episode `{episode}`.")
         except Exception:
@@ -87,7 +87,7 @@ class TVShow(commands.Cog):
             if season > total_seasons:
                 season = total_seasons
 
-            update_season(interaction.user.id, show_data.show_id, season)
+            update_season(str(interaction.user.id), show_data.show_id, season)
 
             await interaction.response.send_message(f"`{show_data.name}` progress updated to season `{season}`.")
         except Exception:

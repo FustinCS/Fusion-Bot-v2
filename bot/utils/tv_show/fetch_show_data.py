@@ -9,6 +9,7 @@ class ShowData:
     show_id: int
     name: str
     total_seasons: int
+    image: int
     seasons: list[Season]
 
 
@@ -21,6 +22,7 @@ def fetch_show_data(show_name: str) -> ShowData:
     
     show_id = show_data['id']
     name = show_data['name']
+    image = show_data['image']['medium']
 
     season_response = requests.get(f"https://api.tvmaze.com/shows/{show_id}/seasons")
     season_data = season_response.json()
@@ -33,6 +35,6 @@ def fetch_show_data(show_name: str) -> ShowData:
         episode_count = season['episodeOrder']
         seasons.append(Season(season_number, episode_count))
     
-    return ShowData(show_id=show_id, name=name, total_seasons=total_seasons, seasons=seasons)
+    return ShowData(show_id=show_id, name=name, total_seasons=total_seasons, image=image, seasons=seasons)
 
     

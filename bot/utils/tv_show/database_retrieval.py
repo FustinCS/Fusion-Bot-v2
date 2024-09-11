@@ -60,7 +60,7 @@ def get_season_episode_count(user_id:int, show_id: int) -> int:
         connection.close()
 
 
-def get_user_watch_list(user_id: int) -> list[ShowEntry]:
+def get_user_watch_list(user_id: str) -> list[ShowEntry]:
     """
     Fetches all of the users currently watched shows.
     """
@@ -83,7 +83,7 @@ def get_user_watch_list(user_id: int) -> list[ShowEntry]:
             LEFT JOIN 
                 "Show" s2 ON w.show_id = s2.show_id AND w.current_season = s2.season
             WHERE 
-                w.user_id = 251839702951264257
+                w.user_id = %s
             ORDER BY 
                 w.date_updated DESC;
         """, (user_id,))
@@ -100,7 +100,7 @@ def get_user_watch_list(user_id: int) -> list[ShowEntry]:
         connection.close()
 
 
-def add_watched_show(user_id: int, entry: ShowData):
+def add_watched_show(user_id: str, entry: ShowData):
     connection = connect_to_db()
     
     # insert into user if doesn't exist
@@ -117,10 +117,10 @@ def add_watched_show(user_id: int, entry: ShowData):
 
         for season in entry.seasons:
             cursor.execute("""
-                INSERT INTO "Show" (show_id, season, name, episodes)
-                VALUES (%s, %s, %s, %s)
+                INSERT INTO "Show" (show_id, season, name, episodes, image)
+                VALUES (%s, %s, %s, %s, %s)
                 ON CONFLICT (show_id, season) DO NOTHING;
-            """, (entry.show_id, season.season_number, entry.name, season.episode_count))
+            """, (entry.show_id, season.season_number, entry.name, season.episode_count, entry.image))
 
         cursor.execute("""
             INSERT INTO "Watches" (user_id, show_id, current_season, current_episode)
@@ -141,7 +141,7 @@ def add_watched_show(user_id: int, entry: ShowData):
         connection.close()
 
 
-def remove_watched_show(user_id: int, show_id: int) -> int:
+def remove_watched_show(user_id: str, show_id: int) -> int:
     connection = connect_to_db()
     try:
         cursor = connection.cursor()
@@ -164,7 +164,7 @@ def remove_watched_show(user_id: int, show_id: int) -> int:
         connection.close()
 
 
-def update_episode(user_id: int, show_id: int, episode: int):
+def update_episode(user_id: str, show_id: int, episode: int):
     connection = connect_to_db()
 
     try:
@@ -183,7 +183,7 @@ def update_episode(user_id: int, show_id: int, episode: int):
         connection.close()
 
 
-def update_season(user_id: int, show_id: int, season: int):
+def update_season(user_id: str, show_id: int, season: int):
     connection = connect_to_db()
 
     try:
